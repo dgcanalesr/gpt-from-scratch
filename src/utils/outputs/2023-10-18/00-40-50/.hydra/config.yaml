@@ -1,6 +1,0 @@
-data:
-  base_dir: .
-  data_dir: data
-  raw_data: input.txt
-  train_data: train_data.pt
-  val_data: val_data.pt
