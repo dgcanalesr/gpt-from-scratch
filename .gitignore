@@ -1,1 +1,6 @@
 .ipynb_checkpoints
+hydra_outputs
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
