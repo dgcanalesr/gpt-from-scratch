@@ -1,6 +1,6 @@
 import hydra
-import os
 import pickle
+import requests
 import torch
 
 from omegaconf import DictConfig
@@ -35,6 +35,12 @@ def decode(list_of_int: list[int], decoding_dict: dict) -> int:
 
 @hydra.main(version_base=None, config_path="../../config", config_name="config")
 def train_val_split(cfg: DictConfig) -> None:
+
+    # Download data
+    response = requests.get(cfg.data.raw_data_url)
+    if response.status_code == 200:
+        with open(cfg.data.raw_data_path, 'w', encoding="utf-8") as file:
+            file.write(response.text)
 
     # Read data
     with open(cfg.data.raw_data_path, "r", encoding="utf-8") as f:

@@ -133,7 +133,7 @@ class GPTModel(nn.Module):
             self, 
             idx: torch.tensor, 
             targets: torch.tensor = None
-        ) -> (torch.tensor, torch.tensor):
+    ) -> (torch.tensor, torch.tensor):
 
         B, T = idx.shape
         token_emb = self.token_embedding_table(idx) #(B,T,C)
