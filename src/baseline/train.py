@@ -1,5 +1,4 @@
 import hydra
-import os
 import torch
 
 from omegaconf import DictConfig
@@ -19,11 +18,14 @@ def train_model(cfg: DictConfig) -> None:
     val_data = torch.load(cfg.data.val_data_path)
 
     # Model
-    model = BigramLanguageModel(cfg.train.vocab_size)
+    model = BigramLanguageModel(cfg.train_baseline.vocab_size)
     model = model.to(device)
 
     # Optimizer
-    optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.train.learning_rate)
+    optimizer = torch.optim.AdamW(
+        model.parameters(), 
+        lr=cfg.train_baseline.learning_rate
+    )
 
     # Loss estimation
     @torch.no_grad()
@@ -31,14 +33,14 @@ def train_model(cfg: DictConfig) -> None:
         out = {}
         model.eval()
         for split in ["train", "val"]:
-            losses = torch.zeros(cfg.train.eval_iters)
-            for k in range(cfg.train.eval_iters):
+            losses = torch.zeros(cfg.train_baseline.eval_iters)
+            for k in range(cfg.train_baseline.eval_iters):
                 X, Y = get_batch(
                     split=split,
                     train_data=train_data,
                     val_data=val_data,
-                    block_size=cfg.train.block_size,
-                    batch_size=cfg.train.batch_size
+                    block_size=cfg.train_baseline.block_size,
+                    batch_size=cfg.train_baseline.batch_size
                 )
                 X, Y = X.to(device), Y.to(device)
                 logits, loss = model(X, Y)
@@ -48,10 +50,10 @@ def train_model(cfg: DictConfig) -> None:
         return out
 
     # Training
-    for iter in range(cfg.train.max_iters):
+    for iter in range(cfg.train_baseline.max_iters):
 
         # Evaluate loss on train and val sets
-        if iter % cfg.train.eval_interval == 0:
+        if iter % cfg.train_baseline.eval_interval == 0:
             losses = estimate_loss()
             print(f"Step {iter}: Train loss {losses['train']:.4f}, \
                 Val loss {losses['val']:.4f}")
@@ -61,8 +63,8 @@ def train_model(cfg: DictConfig) -> None:
             split="train",
             train_data=train_data,
             val_data=val_data,
-            block_size=cfg.train.block_size,
-            batch_size=cfg.train.batch_size
+            block_size=cfg.train_baseline.block_size,
+            batch_size=cfg.train_baseline.batch_size
         )
         xb, yb = xb.to(device), yb.to(device)
 
